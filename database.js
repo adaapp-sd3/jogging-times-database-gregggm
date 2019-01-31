@@ -1,9 +1,8 @@
-var fs = require('fs')
-var SQL = require('sql.js')
+// load the sqlite library
+var sqlite = require('better-sqlite3')
 
 // open a database
-var filebuffer = fs.readFileSync('./database.sqlite')
-var db = new SQL.Database(filebuffer)
+var db = sqlite('./database.sqlite')
 
 // export the database so we can use it elsewhere
 module.exports = db

@@ -14,7 +14,7 @@
         class="mx-auto h-16 p-4 flex items-center justify-between"
         style="width: 800px"
       >
-        <h2>Jog Times</h2>
+        <h2>Friends List</h2>
         <div>
           Signed in as {{ user.name }} ({{ user.email }})
           <a
@@ -30,21 +30,21 @@
         <ul class="list-reset flex">
           <li class="flex-1 mr-2">
             <a
-							class="text-center block border border-white rounded hover:border-grey-lighter text-white hover:bg-purple-light py-2 px-4"
-							href="/account"
+              class="text-center block border border-white rounded hover:border-grey-lighter text-white hover:bg-purple-light py-2 px-4"
+              href="/account"
               >Account</a
             >
           </li>
           <li class="flex-1 mr-2">
             <a
-              class="text-center block border border-grey-light rounded py-2 px-4 bg-white text-purple"
+              class="text-center block border border-white rounded hover:border-grey-lighter text-white hover:bg-purple-light py-2 px-4"
               href="/times"
               >Times</a
             >
           </li>
           <li class="flex-1 mr-2">
             <a
-              class="text-center block border border-white rounded hover:border-grey-lighter text-white hover:bg-purple-light py-2 px-4"
+              class="text-center block border border-grey-light rounded py-2 px-4 bg-white text-purple"
               href="/feed"
               >Feed</a
             >
@@ -58,62 +58,64 @@
       class="mx-auto mt-16 pt-4 flex flex-col justify-center "
     >
       <section class="flex items-center">
-        <div
-          class="m-4 p-6 rounded-lg bg-white flex-1 shadow flex flex-col-reverse"
-        >
+        <div class="m-4 p-6 rounded-lg bg-white flex-1 shadow flex flex-col overflow-scroll">
           <h3 class="uppercase text-sm text-indigo-light font-semibold">
-            Total Distance
+            Total Distance Rank
           </h3>
-          <div class="text-5xl text-indigo font-semibold">
-            {{ stats.totalDistance }}
-            <span class="text-grey-dark uppercase text-base -ml-2">km</span>
-          </div>
+          <ol class="pt-4">
+            {{#each totalDistanceRanking}}
+
+            <li class="text-grey-dark text-base -ml-2">
+              {{ name }} ({{ totalDistance }} km)
+            </li>
+            {{/each}}
+          </ol>
         </div>
 
-        <div
-          class="m-4 p-6 rounded-lg bg-white flex-1 shadow flex flex-col-reverse"
-        >
-          <h3 class="uppercase text-sm text-blue-light font-semibold">
-            Total Time
-          </h3>
-          <div class="text-5xl text-blue font-semibold">
-            {{ stats.totalTime }}
-            <span class="text-grey-dark uppercase text-base -ml-2">hrs</span>
-          </div>
-        </div>
+        <div class="m-4 p-6 rounded-lg bg-white flex-1 shadow flex flex-col overflow-scroll">
+						<h3 class="uppercase text-sm text-blue-light font-semibold">
+							Total Time Rank
+						</h3>
+						<ol class="pt-4">
+							{{#each totalDurationRanking}}
+	
+							<li class="text-grey-dark text-base -ml-2">
+								{{ name }} ({{ totalDuration }} hrs)
+							</li>
+							{{/each}}
+						</ol>
+					</div>
 
-        <div
-          class="m-4 p-6 rounded-lg bg-white flex-1 shadow flex flex-col-reverse"
-        >
-          <h3 class="uppercase text-sm text-teal-light font-semibold">
-            Average Speed
-          </h3>
-          <div class="text-5xl text-teal font-semibold">
-            {{ stats.avgSpeed }}
-            <span class="text-grey-dark uppercase text-base -ml-2">km/h</span>
-          </div>
-        </div>
+					<div class="m-4 p-6 rounded-lg bg-white flex-1 shadow flex flex-col overflow-scroll">
+							<h3 class="uppercase text-sm text-teal-light font-semibold">
+								Average Speed Rank
+							</h3>
+							<ol class="pt-4">
+								{{#each averageSpeedRanking}}
+		
+								<li class="text-grey-dark text-base -ml-2">
+									{{ name }} ({{ averageSpeed }} km/hr)
+								</li>
+								{{/each}}
+							</ol>
+						</div>
       </section>
 
       <section
         class="flex flex-wrap border border-grey-light border-l-0 border-r-0 border-b-0 mt-6 pt-6"
       >
-        <a
-          href="/times/new"
-          class="flex-auto w-64 m-4 p-5 bg-purple-light shadow rounded-lg text-3xl text-white no-underline flex items-center justify-center text-center"
+        {{#each followedUsersJogs}}
+        <div
+          class="flex justify-left flex-grow w-full m-4 p-5 bg-white shadow rounded-lg text-black no-underline"
         >
-          Add new time
-        </a>
+          <p class="text-base font-normal text-xl mt-1 pr-8">{{ userName }}</p>
 
-        {{#each times}}
-        <a
-          class="flex-auto w-64 m-4 p-5 bg-white shadow rounded-lg text-black no-underline"
-          href="/times/{{ id }}"
-        >
-          <h3 class="text-grey-darker uppercase text-base font-normal">
+          <h3
+            class="text-grey-darker uppercase text-base font-normal text-xl mt-1 pr-8"
+          >
             {{ startTime }}
           </h3>
-          <p class="text-xl mt-2">
+          <p class="text-xl mt-1 pr-8">
             {{ distance }}
             <span
               class="uppercase text-sm text-grey-darker font-semibold -ml-1"
@@ -135,7 +137,7 @@
               km/hr
             </span>
           </p>
-        </a>
+        </div>
         {{/each}}
       </section>
     </main>

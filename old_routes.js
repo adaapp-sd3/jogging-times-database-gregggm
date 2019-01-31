@@ -1,9 +1,7 @@
 var express = require('express')
 var bcrypt = require('bcryptjs')
-var uuidv1 = require('uuid/v1');
 
 var User = require('./models/User')
-const JogTimes = require('./models/JogTimes')
 
 var routes = new express.Router()
 
@@ -31,9 +29,7 @@ routes.get('/create-account', function(req, res) {
 
 // handle create account forms:
 routes.post('/create-account', function(req, res) {
-	var form = req.body
-	
-	const uuid = uuidv1()
+  var form = req.body
 
   // TODO: add some validation in here to check
 
@@ -41,10 +37,10 @@ routes.post('/create-account', function(req, res) {
   var passwordHash = bcrypt.hashSync(form.password, saltRounds)
 
   // create the user
-  User.insert(uuid, form.name, form.email, passwordHash)
+  var userId = User.insert(form.name, form.email, passwordHash)
 
   // set the userId as a cookie
-  res.cookie('userId', uuid)
+  res.cookie('userId', userId)
 
   // redirect to the logged in page
   res.redirect('/times')
@@ -94,17 +90,12 @@ routes.get('/sign-out', function(req, res) {
 
 // list all job times
 routes.get('/times', function(req, res) {
-	var loggedInUser = User.findById(req.cookies.userId)
-	if (loggedInUser === null) {
-		res.redirect('/sign-in')
-		return
-	}
+  var loggedInUser = User.findById(req.cookies.userId)
 
-	const usersJogTimes = JogTimes.findByUserId(req.cookies.userId)
-
-  var totalDistance = usersJogTimes.reduce((acc, curr) => acc + curr.distance, 0)
-  var totalTime = usersJogTimes.reduce((acc, curr) => acc + curr.duration, 0)
-  var avgSpeed = totalDistance / totalTime
+  // fake stats - TODO: get real stats from the database
+  var totalDistance = 13.45
+  var avgSpeed = 5.42
+  var totalTime = 8.12322
 
   res.render('list-times.html', {
     user: loggedInUser,
@@ -114,15 +105,38 @@ routes.get('/times', function(req, res) {
       avgSpeed: avgSpeed.toFixed(2)
     },
 
-    times: usersJogTimes
+    // fake times: TODO: get the real jog times from the db
+    times: [
+      {
+        id: 1,
+        startTime: '4:36pm 1/11/18',
+        duration: 12.23,
+        distance: 65.43,
+        avgSpeed: 5.34
+      },
+      {
+        id: 2,
+        startTime: '2:10pm 3/11/18',
+        duration: 67.4,
+        distance: 44.43,
+        avgSpeed: 0.66
+      },
+      {
+        id: 3,
+        startTime: '3:10pm 4/11/18',
+        duration: 67.4,
+        distance: 44.43,
+        avgSpeed: 0.66
+      }
+    ]
   })
 })
 
 // show the create time form
 routes.get('/times/new', function(req, res) {
   // this is hugely insecure. why?
-	var loggedInUser = User.findById(req.cookies.userId)
-	
+  var loggedInUser = User.findById(req.cookies.userId)
+
   res.render('create-time.html', {
     user: loggedInUser
   })
@@ -130,9 +144,11 @@ routes.get('/times/new', function(req, res) {
 
 // handle the create time form
 routes.post('/times/new', function(req, res) {
-  const { startTime, distance, duration } = req.body
+  var form = req.body
 
-	JogTimes.insert(req.cookies.userId, startTime, distance, duration)
+  console.log('create time', form)
+
+  // TODO: save the new time
 
   res.redirect('/times')
 })
@@ -140,102 +156,44 @@ routes.post('/times/new', function(req, res) {
 // show the edit time form for a specific time
 routes.get('/times/:id', function(req, res) {
   var timeId = req.params.id
-	console.log('get time', timeId)
-	const loggedInUser = User.findById(req.cookies.userId)
-	const jog = JogTimes.findJogWithId(timeId, loggedInUser.id)
+  console.log('get time', timeId)
 
-	if (jog === null) {
-		res.redirect('/times')
-	} else {
-		res.render('edit-time.html', {
-			user: loggedInUser,
-			time: jog
-		})
-	}
+  // TODO: get the real time for this id from the db
+  var jogTime = {
+    id: timeId,
+    startTime: formatDateForHTML('2018-11-4 15:17'),
+    duration: 67.4,
+    distance: 44.43
+  }
+
+  res.render('edit-time.html', {
+    time: jogTime
+  })
 })
 
 // handle the edit time form
 routes.post('/times/:id', function(req, res) {
   var timeId = req.params.id
-  const { startTime, distance, duration } = req.body
-	
-	JogTimes.update(startTime, distance, duration, timeId)
+  var form = req.body
+
+  console.log('edit time', {
+    timeId: timeId,
+    form: form
+  })
+
+  // TODO: edit the time in the db
 
   res.redirect('/times')
 })
 
-// handle deleting the time
+// handle deleteing the time
 routes.get('/times/:id/delete', function(req, res) {
   var timeId = req.params.id
+  console.log('delete time', timeId)
 
-	JogTimes.delete(timeId)
+  // TODO: delete the time
 
   res.redirect('/times')
-})
-
-// show my account page
-routes.get('/account', function(req, res) {
-	var loggedInUser = User.findById(req.cookies.userId)
-	if (loggedInUser === null) {
-		res.redirect('/sign-in')
-		return
-	}
-
-	const allUsers = User.findAll()
-	const followers = loggedInUser.findFollowers()
-	const followed = loggedInUser.findFollowed()
-
-	res.render('my-account.html', {
-		user: loggedInUser,
-		allUsers,
-		followers,
-		followed
-	})
-})
-
-// follow friend
-routes.post('/follow', function(req, res) {
-	const loggedInUser = User.findById(req.cookies.userId)
-
-	if (req.body.follow_user_id != loggedInUser.id) {
-		try {
-			const info = loggedInUser.followUser(req.body.follow_user_id)
-			console.log(info)
-		} catch(error) {
-			console.error(error.message)
-		}
-	}
-
-	res.redirect('back')
-})
-
-// delete account
-routes.get('/account/delete', function(req, res) {
-	const info = User.remove(req.cookies.userId)
-	console.log(info)
-
-  res.clearCookie('userId')
-  res.redirect('/sign-in')
-})
-
-// show the feed
-routes.get('/feed', function(req, res) {
-	var loggedInUser = User.findById(req.cookies.userId)
-	if (loggedInUser === null) {
-		res.redirect('/sign-in')
-		return
-	}
-
-	const followedUsersJogs = JogTimes.findJogsFromFollowedUsers(loggedInUser.id)
-	const rankings = loggedInUser.getRankings()
-
-	res.render('feed.html', {
-		user: loggedInUser,
-		followedUsersJogs,
-		totalDistanceRanking: rankings.distance,
-		totalDurationRanking: rankings.duration,
-		averageSpeedRanking: rankings.speed
-	})
 })
 
 module.exports = routes

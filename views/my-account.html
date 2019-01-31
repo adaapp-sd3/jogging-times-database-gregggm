@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <title>Jog Times</title>
+
+    <!-- Tailwind.css is a CSS library. Read the docs here: -->
+    <!-- https://tailwindcss.com/docs/what-is-tailwind -->
+    <link rel="stylesheet" href="/tailwind.css" />
+  </head>
+  <body class="bg-grey-lightest">
+    <header class="fixed pin-x pin-t bg-purple shadow text-white">
+      <div
+        class="mx-auto h-16 p-4 flex items-center justify-between"
+        style="width: 800px"
+      >
+        <h2>My Account</h2>
+        <div>
+          Signed in as {{ user.name }} ({{ user.email }})
+          <a
+            href="/sign-out"
+            class="text-white border border-white rounded p-2 no-underline hover:bg-purple-light ml-4"
+          >
+            Sign Out
+          </a>
+        </div>
+      </div>
+
+      <div style="width: 800px" class="items-center mx-auto px-4 pb-4">
+        <ul class="list-reset flex">
+          <li class="flex-1 mr-2">
+            <a
+              class="text-center block border border-grey-light rounded py-2 px-4 bg-white text-purple"
+              href="/account"
+              >Account</a
+            >
+          </li>
+          <li class="flex-1 mr-2">
+            <a
+              class="text-center block border border-white rounded hover:border-grey-lighter text-white hover:bg-purple-light py-2 px-4"
+              href="/times"
+              >Times</a
+            >
+          </li>
+          <li class="flex-1 mr-2">
+            <a
+              class="text-center block border border-white rounded hover:border-grey-lighter text-white hover:bg-purple-light py-2 px-4"
+              href="/feed"
+              >Feed</a
+            >
+          </li>
+        </ul>
+      </div>
+    </header>
+
+    <main
+      style="width: 800px; margin-top: 116px"
+      class="mx-auto mt-16 pt-4 flex flex-col justify-center "
+    >
+      <section>
+        <h3 class="uppercase text-sm text-indigo-light font-semibold p-4">
+          My Followers
+        </h3>
+        <div class="flex flex-wrap">
+          {{#each followers}}
+          <div
+            class="flex-none w-1/5 m-4 p-5 bg-white shadow rounded-lg text-black no-underline"
+          >
+            <h3 class="inline text-grey-darker uppercase text-base font-normal">
+              {{ name }}
+            </h3>
+          </div>
+          {{/each}}
+        </div>
+			</section>
+			
+			<section>
+					<h3 class="uppercase text-sm text-indigo-light font-semibold p-4">
+						I'm Following
+					</h3>
+					<div class="flex flex-wrap">
+						{{#each followed}}
+						<div
+							class="flex-none w-1/5 m-4 p-5 bg-white shadow rounded-lg text-black no-underline"
+						>
+							<h3 class="inline text-grey-darker uppercase text-base font-normal">
+								{{ name }}
+							</h3>
+						</div>
+						{{/each}}
+					</div>
+				</section>
+
+      <section
+        class="border border-grey-light border-l-0 border-r-0 border-b-0 mt-6 pt-6"
+      >
+        <h3 class="uppercase text-sm text-indigo-light font-semibold p-4">
+          Find Friends
+        </h3>
+        <div class="flex flex-wrap">
+          {{#each allUsers}}
+          <div
+            class="flex-none w-1/5 m-4 p-2 bg-grey-light shadow rounded-lg text-black no-underline text-xl"
+          >
+            <h3 class="inline text-grey-darker uppercase text-base font-normal">
+              {{ name }}
+            </h3>						
+						<form method="POST" action="/follow">
+							<button class="inline w-12 p-1 bg-blue-light shadow rounded-lg text-sm text-white no-underline flex items-center justify-center text-center" type="submit" name="follow_user_id" value="{{ id }}">Add</button>
+						</form>
+
+          </div>
+          {{/each}}
+        </div>
+      </section>
+
+      <section
+        class="flex border border-grey-light border-l-0 border-r-0 border-b-0 mt-6 pt-6"
+      >
+        <a
+          href="/account/delete"
+          class="flex-auto w-64 m-4 p-5 bg-red-light shadow rounded-lg text-xl text-white no-underline flex items-center justify-center text-center"
+        >
+          Delete Account
+        </a>
+      </section>
+    </main>
+  </body>
+</html>
