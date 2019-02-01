@@ -52,7 +52,8 @@
             class="block rounded bg-grey-lighter p-2 mt-2 w-full"
             type="number"
             name="distance"
-            value="{{ time.distance }}"
+						value="{{ time.distance }}"
+						max="1000"
             required
           />
         </label>
@@ -63,7 +64,8 @@
             class="block rounded bg-grey-lighter p-2 mt-2 w-full"
             type="number"
             name="duration"
-            value="{{ time.duration }}"
+						value="{{ time.duration }}"
+						max="1000"
             required
           />
         </label>

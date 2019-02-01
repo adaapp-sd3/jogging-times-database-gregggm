@@ -24,7 +24,7 @@ class User {
     var userId = info.lastInsertRowid
 
     return userId
-  }
+	}
 
   static findById(id) {
     var row = selectUserById.get(id)

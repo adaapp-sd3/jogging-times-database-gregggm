@@ -10,7 +10,11 @@ var routes = new express.Router()
 var saltRounds = 10
 
 function formatDateForHTML(date) {
-  return new Date(date).toISOString().slice(0, -8)
+	const dateObj = new Date(date)
+	console.log(dateObj.toLocaleString())
+  return dateObj.toLocaleString('en-GB', {
+		day: 'numeric', month: 'numeric', year: '2-digit', hour: '2-digit', minute:'2-digit'
+	})
 }
 
 // main page
@@ -35,19 +39,38 @@ routes.post('/create-account', function(req, res) {
 	
 	const uuid = uuidv1()
 
-  // TODO: add some validation in here to check
+	try {
+		// validate passwords match
+		if (form.password != form.passwordConfirm) {
+			throw new Error('Passwords did not match')
+		}
 
-  // hash the password - we dont want to store it directly
-  var passwordHash = bcrypt.hashSync(form.password, saltRounds)
+		// validate email address
+		var re = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+		if (re.test(String(form.email).toLowerCase()) != true) {
+			throw new Error('Email was not valid')
+		}
 
-  // create the user
-  User.insert(uuid, form.name, form.email, passwordHash)
 
-  // set the userId as a cookie
-  res.cookie('userId', uuid)
 
-  // redirect to the logged in page
-  res.redirect('/times')
+		// hash the password - we dont want to store it directly
+		var passwordHash = bcrypt.hashSync(form.password, saltRounds)
+
+		// create the user
+		User.insert(uuid, form.name, form.email, passwordHash)
+
+		// set the userId as a cookie
+		res.cookie('userId', uuid)
+
+		// redirect to the logged in page
+		res.redirect('/times')
+	} 
+	catch (error) {
+		console.error(error.message)
+		res.render('create-account.html', {
+			errorMessage: error.message
+		})
+	}
 })
 
 // show the sign-in page
@@ -101,6 +124,7 @@ routes.get('/times', function(req, res) {
 	}
 
 	const usersJogTimes = JogTimes.findByUserId(req.cookies.userId)
+	const formattedJogs = usersJogTimes.map(jog => ({ ...jog, startTime: formatDateForHTML(jog.startTime) }))
 
   var totalDistance = usersJogTimes.reduce((acc, curr) => acc + curr.distance, 0)
   var totalTime = usersJogTimes.reduce((acc, curr) => acc + curr.duration, 0)
@@ -114,7 +138,7 @@ routes.get('/times', function(req, res) {
       avgSpeed: avgSpeed.toFixed(2)
     },
 
-    times: usersJogTimes
+    times: formattedJogs
   })
 })
 
@@ -227,11 +251,12 @@ routes.get('/feed', function(req, res) {
 	}
 
 	const followedUsersJogs = JogTimes.findJogsFromFollowedUsers(loggedInUser.id)
+	const formattedJogs = followedUsersJogs.map(jog => ({ ...jog, startTime: formatDateForHTML(jog.startTime) }))
 	const rankings = loggedInUser.getRankings()
 
 	res.render('feed.html', {
 		user: loggedInUser,
-		followedUsersJogs,
+		followedUsersJogs: formattedJogs,
 		totalDistanceRanking: rankings.distance,
 		totalDurationRanking: rankings.duration,
 		averageSpeedRanking: rankings.speed

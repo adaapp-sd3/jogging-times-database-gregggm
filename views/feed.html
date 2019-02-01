@@ -58,11 +58,11 @@
       class="mx-auto mt-16 pt-4 flex flex-col justify-center "
     >
       <section class="flex items-center">
-        <div class="m-4 p-6 rounded-lg bg-white flex-1 shadow flex flex-col overflow-scroll">
+        <div class="m-4 p-6 rounded-lg bg-white flex-1 shadow flex flex-col" style="max-height:200px">
           <h3 class="uppercase text-sm text-indigo-light font-semibold">
             Total Distance Rank
           </h3>
-          <ol class="pt-4">
+          <ol class="pt-4 overflow-scroll">
             {{#each totalDistanceRanking}}
 
             <li class="text-grey-dark text-base -ml-2">
@@ -72,11 +72,11 @@
           </ol>
         </div>
 
-        <div class="m-4 p-6 rounded-lg bg-white flex-1 shadow flex flex-col overflow-scroll">
+        <div class="m-4 p-6 rounded-lg bg-white flex-1 shadow flex flex-col style="max-height:200px"">
 						<h3 class="uppercase text-sm text-blue-light font-semibold">
 							Total Time Rank
 						</h3>
-						<ol class="pt-4">
+						<ol class="pt-4 overflow-scroll">
 							{{#each totalDurationRanking}}
 	
 							<li class="text-grey-dark text-base -ml-2">
@@ -86,11 +86,11 @@
 						</ol>
 					</div>
 
-					<div class="m-4 p-6 rounded-lg bg-white flex-1 shadow flex flex-col overflow-scroll">
+					<div class="m-4 p-6 rounded-lg bg-white flex-1 shadow flex flex-col style="max-height:200px"">
 							<h3 class="uppercase text-sm text-teal-light font-semibold">
 								Average Speed Rank
 							</h3>
-							<ol class="pt-4">
+							<ol class="pt-4 overflow-scroll">
 								{{#each averageSpeedRanking}}
 		
 								<li class="text-grey-dark text-base -ml-2">
