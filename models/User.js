@@ -95,6 +95,16 @@ class User {
 		}
 	}
 
+	findNotFollowed() {
+		const rows = selectNotFollowed.all(this.id)
+
+		if (rows) {
+			return rows.map(row => new User(row))
+		} else {
+			return null
+		}
+	}
+
 	getRankings() {
 		const rankings = {}
 
